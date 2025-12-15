@@ -3,6 +3,7 @@
 #    pip install fastapi uvicorn
 
 
+import datetime
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uvicorn   # 帮我们省掉手写 JSON 解析的麻烦
@@ -72,7 +73,8 @@ def list_sentences():
 if __name__ == "__main__":
     # 初始化日志
     from long_stream.log import init_logger,logger
-    init_logger()
+    # 以当前时间命名日志文件，避免覆盖旧日志
+    init_logger(f"long_stream_{datetime.date.today()}.log")
     logger.info("应用启动中...")
     uvicorn.run(
         "main:app",

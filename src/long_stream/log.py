@@ -5,9 +5,10 @@ from loguru import logger
 # 这里定义常量也有好处是方便给其他地方使用 （可以先保留我这里没有例子演示，说不定后续有）
 ROTATION_SIZE = "5 MB"
 RETENTION_DAYS = 5
+LOG_LEVEL = "INFO" # 默认日志等级
 
 
-def init_logger(log_file: str = "app.log", level: str = "INFO"):
+def init_logger(log_file: str = "app.log", level: str = LOG_LEVEL):
     """
     初始化日志配置.
 
