@@ -7,24 +7,14 @@ import datetime
 from email.policy import HTTP
 from fastapi import FastAPI, HTTPException
 from fastapi import status
-from pydantic import BaseModel
 import uvicorn   # 帮我们省掉手写 JSON 解析的麻烦
+from sentence import SentenceIn, SentenceOut;
 
 
 # 1. 创建“纸面句子表”的内存替身
 #    真实项目会用数据库，但先别管，把闭环跑通再说。
 fake_db = {}
 
-# 2. 定义“句子”长什么样（字段、类型）
-#    BaseModel 会自动把前端 JSON 变成 Python 对象，反之亦然。
-class SentenceIn(BaseModel):
-    content: str              # 只保留最刚需的字段，别的以后加
-    author: str
-
-class SentenceOut(BaseModel):
-    id: int                   # 返回时多带一个 id，让前端知道存哪了
-    content: str
-    author : str
 
 # 3. 生成 FastAPI 应用实例；app 这个名字别改，因为启动命令里用到了
 app = FastAPI()
@@ -44,7 +34,7 @@ def create_sentence(sentence: SentenceIn):
       - 把返回值转成 JSON（按 SentenceOut 的字段）
     """
     global current_id
-    new_sentence = {""
+    new_sentence = {
     "id": current_id, 
     "content": sentence.content,
     "author": sentence.author}
@@ -102,5 +92,5 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="localhost",
-        port=25357,
+        port=8000,
     )
