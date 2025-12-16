@@ -4,9 +4,12 @@
 
 
 import datetime
+from email.policy import HTTP
 from fastapi import FastAPI, HTTPException
+from fastapi import status
 from pydantic import BaseModel
 import uvicorn   # 帮我们省掉手写 JSON 解析的麻烦
+
 
 # 1. 创建“纸面句子表”的内存替身
 #    真实项目会用数据库，但先别管，把闭环跑通再说。
@@ -62,6 +65,26 @@ def read_sentence(sentence_id: int):
         raise HTTPException(status_code=404, detail="句子不存在")
     return sentence
 
+# 7. 实现“删除句子”接口
+@app.delete("/sentences/{sentence_id}",status_code=status.HTTP_204_NO_CONTENT)
+def delete_sentence(sentence_id:int):
+    if sentence_id not in fake_db:
+        raise HTTPException(status_code=404, detail="句子不存在")
+    del fake_db[sentence_id]
+
+# 8. 实现“更新句子”接口
+@app.put("/sentences/{sentence_id}", response_model=SentenceOut)
+def update_sentence(sentence_id: int, sentence: SentenceIn):
+    if sentence_id not in fake_db:
+        raise HTTPException(status_code=404,detail="句子不存在")
+    fake_db[sentence_id] = {
+        "id": sentence_id,
+        "content": sentence.content,
+        "author": sentence.author
+    }
+    return fake_db[sentence_id]
+
+# 9. 实现“列出所有句子”接口
 @app.get("/sentences", response_model=list[SentenceOut])
 def list_sentences():
     """
