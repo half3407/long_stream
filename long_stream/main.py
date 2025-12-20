@@ -1,20 +1,19 @@
 import datetime
-from fastapi.routing import APIRoute
 import uvicorn
-from log import init_logger,logger
-from fastapi import APIRouter, FastAPI
+from log import init_logger, logger
+from fastapi import  FastAPI
 from db.database import init_db
 from controls.ctl_sentence import sentence_router
 from controls.ctl_user import user_router
-ROOT_ROUTER_PREFIX="/api/v1"
+ROOT_ROUTER_PREFIX=""
 
 app = FastAPI(version="1.0.0", title="Long Stream API", root_path=ROOT_ROUTER_PREFIX)
 
-test_router = APIRouter()
+# 在模块导入时注册路由，这样使用 uvicorn 导入模块时也能正确生成 OpenAPI
+router_list = [sentence_router, user_router]
 
-@test_router.get("/ping")
-def ping():
-    return {"message": "pong"}
+for router in router_list:
+    app.include_router(router, prefix="/api/v1")
 
 # 程序主入口
 if __name__ == "__main__":
@@ -25,11 +24,8 @@ if __name__ == "__main__":
     logger.info("初始化数据库...")
     init_db()
     logger.info("数据库初始化完成。")
-    
-    router_list = [sentence_router, user_router, test_router]
 
     for router in router_list:
-        app.include_router(router=router)
         [logger.info(f"已注册路由:[{tuple(sub_router.methods)[0]}] {ROOT_ROUTER_PREFIX}{sub_router.path}") for sub_router in router.routes] # type: ignore
 
     uvicorn.run(

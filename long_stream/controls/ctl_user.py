@@ -4,7 +4,7 @@ from models.user import UserIn, UserORM, UserOut
 from db.database import get_db_session
 from utils.password import secret_hash_password
 
-user_router = APIRouter(prefix="/auth", tags=["用户认证"])
+user_router = APIRouter(prefix="", tags=["用户认证"])
 
 
 @user_router.post("/register", response_model=UserOut)
@@ -16,12 +16,12 @@ def register(user: UserIn, db: Session = Depends(get_db_session)):
     4. 返回不含密码的用户信息
     """
     # ① 唯一性检查
-    if db.query(UserORM).filter(UserORM.name == user.name).first():
+    if db.query(UserORM).filter(UserORM.username == user.username).first():
         raise HTTPException(status_code=400, detail="用户名已存在")
 
     # ③ 入库
     new_user = UserORM(
-        name=user.name, password_hash=secret_hash_password(user.password)
+        username=user.username, password_hash=secret_hash_password(user.password)
     )
     db.add(new_user)
     db.commit()
