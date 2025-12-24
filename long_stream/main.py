@@ -1,10 +1,10 @@
 import datetime
 import uvicorn
-from log import init_logger, logger
+from long_stream.log import init_logger, logger
 from fastapi import  FastAPI
-from db.database import init_db
-from controls.ctl_sentence import sentence_router
-from controls.ctl_user import user_router
+from long_stream.db.database import init_db
+from long_stream.controls.ctl_sentence import sentence_router
+from long_stream.controls.ctl_user import user_router
 ROOT_ROUTER_PREFIX=""
 
 app = FastAPI(version="1.0.0", title="Long Stream API", root_path=ROOT_ROUTER_PREFIX)
@@ -13,7 +13,7 @@ app = FastAPI(version="1.0.0", title="Long Stream API", root_path=ROOT_ROUTER_PR
 router_list = [sentence_router, user_router]
 
 for router in router_list:
-    app.include_router(router, prefix="/api/v1")
+    app.include_router(user_router, prefix="/api/v1/auth")
 
 # 程序主入口
 if __name__ == "__main__":

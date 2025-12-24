@@ -20,3 +20,8 @@ class UserORM(declarative_base()):
     username = Column(String(50), unique=True, index=True, nullable=False)
     password_hash = Column(String(100), nullable=False)
     create_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
