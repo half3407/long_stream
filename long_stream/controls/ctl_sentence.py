@@ -38,8 +38,8 @@ def update_sentence(
     sentence = db.get(SentenceORM, sentence_id)
     if not sentence:
         raise HTTPException(status_code=404, detail="句子不存在")
-    sentence.content = Column(req_sentence.content)
-    sentence.author = Column(req_sentence.author)
+    sentence.content = req_sentence.content # type: ignore
+    sentence.author = req_sentence.author # type: ignore
     db.commit()
     db.refresh(sentence)
     return SentenceOut(**sentence.__dict__)

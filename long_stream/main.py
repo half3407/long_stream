@@ -12,8 +12,8 @@ app = FastAPI(version="1.0.0", title="Long Stream API", root_path=ROOT_ROUTER_PR
 # 在模块导入时注册路由，这样使用 uvicorn 导入模块时也能正确生成 OpenAPI
 router_list = [sentence_router, user_router]
 
-for router in router_list:
-    app.include_router(user_router, prefix="/api/v1/auth")
+app.include_router(sentence_router, prefix="/api/v1")
+app.include_router(user_router, prefix="/api/v1/auth")
 
 # 程序主入口
 if __name__ == "__main__":
@@ -26,8 +26,9 @@ if __name__ == "__main__":
     logger.info("数据库初始化完成。")
 
     for router in router_list:
-        [logger.info(f"已注册路由:[{tuple(sub_router.methods)[0]}] {ROOT_ROUTER_PREFIX}{sub_router.path}") for sub_router in router.routes] # type: ignore
-
+        for sub_router in router.routes:
+            print(f"已注册路由:[{tuple(sub_router.methods)[0]}] {ROOT_ROUTER_PREFIX}{sub_router.path}") # type: ignore
+            
     uvicorn.run(
         "main:app",
         host="localhost",
