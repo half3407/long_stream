@@ -1,8 +1,8 @@
 from fastapi import APIRouter
 from fastapi import Depends, HTTPException
 from sqlalchemy import Column
-from long_stream.db.database import get_db_session
-from long_stream.models.sentence import SentenceIn, SentenceORM, SentenceOut
+from db.database import get_db_session
+from models.sentence import SentenceIn, SentenceORM, SentenceOut
 from sqlalchemy.orm import Session
 
 sentence_router = APIRouter(prefix="/sentences", tags=["句子管理"])

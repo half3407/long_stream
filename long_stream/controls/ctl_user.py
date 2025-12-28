@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from long_stream.models.user import UserIn, UserORM, UserOut
-from long_stream.db.database import get_db_session
-from long_stream.utils.password import secret_hash_password, secret_verify_password
-from long_stream.models.user import Token
-from long_stream.utils.password import create_access_token
+from models.user import UserIn, UserORM, UserOut
+from db.database import get_db_session
+from utils.password import secret_hash_password, secret_verify_password
+from models.user import Token
+from utils.password import generate_user_jwt
 
 user_router = APIRouter(prefix="", tags=["用户认证"])
 
@@ -36,5 +36,5 @@ def login(form: UserIn, db: Session = Depends(get_db_session)):
     user = db.query(UserORM).filter(UserORM.username == form.username).first()
     if not user or not secret_verify_password(form.password, user.password_hash.encode('utf-8')):
         raise HTTPException(status_code=401, detail="用户名或密码错误")
-    token = create_access_token(data={"sub": str(user.id)})
-    return {"access_token": token, "token_type": "bearer"}
+    token = generate_user_jwt(UserOut(**user.__dict__))
+    return {"access_token": token, "token_type": "jwt"}

@@ -1,8 +1,8 @@
 # long_stream/utils/auth.py
 from sqlalchemy.orm import Session
-from long_stream.models.user import UserORM, UserOut
-from long_stream.utils.password import secret_hash_password, secret_verify_password
-from long_stream.db.database import get_db_session
+from models.user import UserORM, UserOut
+from utils.password import secret_hash_password, secret_verify_password
+from db.database import get_db_session
 from fastapi import Depends, HTTPException
 
 def register_user(username: str, password: str, db: Session = Depends(get_db_session)) -> UserOut:

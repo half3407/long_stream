@@ -8,6 +8,8 @@ __pycache__/
 
 # 忽略 虚拟环境 文件夹
 myvenv/
+.venv/
+.env
 
 # 忽略 日志文件
 *.log

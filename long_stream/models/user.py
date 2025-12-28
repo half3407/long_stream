@@ -1,4 +1,5 @@
 # models_user.py
+from datetime import datetime
 from pydantic import BaseModel
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, func
@@ -12,7 +13,7 @@ class UserIn(BaseModel):
 class UserOut(BaseModel):
     id: int
     username: str  # 返回时不含密码
-
+    create_at: datetime
 
 class UserORM(declarative_base()):
     __tablename__ = "users"
