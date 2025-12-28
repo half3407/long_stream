@@ -1,10 +1,11 @@
+import os
 from loguru import logger
 
 # 这里定义日志轮转大小和保留天数的常量
 # 常量的特点就是全部大写，方便识别
 # 这里定义常量也有好处是方便给其他地方使用 （可以先保留我这里没有例子演示，说不定后续有）
-ROTATION_SIZE = "5 MB"
-RETENTION_DAYS = 5
+retention_days = os.getenv("LONG_STREAM_LOG_RETENTION_DAYS", "5")
+retention = f"{retention_days} days"
 LOG_LEVEL = "INFO"  # 默认日志等级
 
 
@@ -24,16 +25,16 @@ def init_logger(log_file: str = "app.log", level: str = LOG_LEVEL):
     # 添加日志文件与配置日志等级
     logger.add(
         log_file,
-        level=level,
-        rotation=ROTATION_SIZE,
-        retention=RETENTION_DAYS,
+        level=os.environ.get("LONG_STREAM_LOG_FILE_LEVEL", "DEBUG"),
+        rotation=os.environ.get("LONG_STREAM_LOG_ROTATION_SIZE", "5 MB"),
+        retention=retention,
         compression="zip",
     )
 
     # 添加控制台输出
     logger.add(
         sink=lambda msg: print(msg, end=""),
-        level=level,
+        level=os.environ.get("LONG_STREAM_LOG_CONSOLE_LEVEL", "INFO"),
     )
 
     # 日志等级解释:
@@ -48,5 +49,5 @@ def init_logger(log_file: str = "app.log", level: str = LOG_LEVEL):
 
     logger.info(f"日志器初始化... 日志文件 {log_file} 当前日志等级 {level}")
     logger.info(
-        f"日志器配置：轮转大小 {ROTATION_SIZE}，保留天数 {5} 天，旧日志压缩为 zip 格式"
+        f"日志器配置：轮转大小 {os.environ.get("LONG_STREAM_LOG_ROTATION_SIZE", "5 MB")}，保留天数 {5} 天，旧日志压缩为 zip 格式"
     )
