@@ -25,22 +25,16 @@ def secret_verify_password(plain_password: str, hashed_password: bytes) -> bool:
 
 from jwt import ExpiredSignatureError, InvalidTokenError
 
-SECRET_KEY = os.environ.get("LONG_STREAM_JWT_SECRET")
-ALGORITHM = "HS256"
+SECRET_KEY: str = os.environ["SECRET_KEY"]
+ALGORITHM: str = os.getenv("ALGORITHM", "HS256")
 
 
-# 生成 JWT
-# def generate_jwt(user_id: str) -> str:
-#     data_body = {
-#         "sub": user_id,
-#         "iat": datetime.utcnow(), # 签发时间
-#         "exp": datetime.utcnow() + timedelta(hours=1), # 过期时间
-#     }
-#     return jwt.encode(data_body, SECRET_KEY, algorithm=ALGORITHM)
-def generate_jwt(data_body: Dict, exp: datetime) -> str:
-    data_body["iat"] = datetime.now(timezone.utc)
-    data_body["exp"] = exp
-    return jwt.encode(data_body, SECRET_KEY, algorithm=ALGORITHM)
+def generate_jwt(data_body: Dict, exp_minutes: int = 30) -> str:
+    to_encode = data_body.copy()
+    expire = datetime.now(timezone.utc) + timedelta(minutes=exp_minutes)
+    # 转成 Unix 时间戳（秒）
+    to_encode.update({"exp": int(expire.timestamp())})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 
 def generate_user_jwt(user: UserOut) -> str:
@@ -51,10 +45,9 @@ def generate_user_jwt(user: UserOut) -> str:
         "user_username": user.username,
         "user_create_at": user.create_at,
     }
-    return generate_jwt(data_body, exp)
+    return generate_jwt(data_body, exp_minutes=7*24*60)  # 7天有效期
 
 
-# 校验 JWT(待优化)
 def verify_jwt(token: str):
     try:
         payload = jwt.decode(

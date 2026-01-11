@@ -5,7 +5,7 @@ import os
 import datetime
 import uvicorn
 from log import init_logger, logger
-from fastapi import  FastAPI
+from fastapi import  FastAPI, Request
 from db.database import init_db
 from controls.ctl_sentence import sentence_router
 from controls.ctl_user import user_router

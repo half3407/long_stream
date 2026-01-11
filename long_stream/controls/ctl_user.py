@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models.user import UserIn, UserORM, UserOut
 from db.database import get_db_session
-from utils.password import secret_hash_password, secret_verify_password
+from utils.password import generate_jwt, secret_hash_password, secret_verify_password
 from models.user import Token
 from utils.password import generate_user_jwt
 
@@ -36,5 +36,9 @@ def login(form: UserIn, db: Session = Depends(get_db_session)):
     user = db.query(UserORM).filter(UserORM.username == form.username).first()
     if not user or not secret_verify_password(form.password, user.password_hash.encode('utf-8')):
         raise HTTPException(status_code=401, detail="用户名或密码错误")
-    token = generate_user_jwt(UserOut(**user.__dict__))
-    return {"access_token": token, "token_type": "jwt"}
+    token_data = {
+        "sub": str(user.id), 
+        "username": user.username,
+    }
+    access_token = generate_jwt(token_data, exp_minutes=30)
+    return {"access_token": access_token, "token_type": "bearer"}

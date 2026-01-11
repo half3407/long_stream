@@ -22,7 +22,7 @@ def init_db():
         logger.info(f"数据表 {orm.__tablename__} 结构已同步")
 
 def get_db_session():
-    db = SessionLocal()   # ← 现在一定能找到
+    db = SessionLocal()
     try:
         yield db
     finally:

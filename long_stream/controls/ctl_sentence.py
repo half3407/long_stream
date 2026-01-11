@@ -1,9 +1,11 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from fastapi import Depends, HTTPException
 from sqlalchemy import Column
 from db.database import get_db_session
 from models.sentence import SentenceIn, SentenceORM, SentenceOut
 from sqlalchemy.orm import Session
+from utils.auth import verify_token
+from models.token import TokenData
 
 sentence_router = APIRouter(prefix="/sentences", tags=["句子管理"])
 
@@ -46,9 +48,11 @@ def update_sentence(
 
 
 @sentence_router.post("/delete/{sentence_id}")
-def delete_sentence(sentence_id: int, db: Session = Depends(get_db_session)):
+def delete_sentence(sentence_id: int, request: Request, db: Session = Depends(get_db_session), current_user: TokenData = Depends(verify_token)):
     sentence = db.get(SentenceORM, sentence_id)
     if not sentence:
         raise HTTPException(status_code=404, detail="句子不存在")
     db.delete(sentence)
     db.commit()
+    return {"detail": "删除成功"}
+
