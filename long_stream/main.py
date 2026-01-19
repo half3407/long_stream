@@ -1,14 +1,23 @@
 from dotenv import load_dotenv
 # 导入生效环境变量配置
 load_dotenv()
+import sys
 import os
+sys.path.append(os.path.dirname(__file__))
 import datetime
 import uvicorn
 from log import init_logger, logger
-from fastapi import  FastAPI, Request
-from db.database import init_db
+from fastapi import  FastAPI
 from controls.ctl_sentence import sentence_router
 from controls.ctl_user import user_router
+from models.orm import UserORM, SentenceORM
+from db.database import engine
+
+def init_db():
+    orm_lists = [UserORM, SentenceORM]
+    for orm in orm_lists:
+        orm.__table__.create(bind=engine, checkfirst=True)
+        logger.info(f"数据表 {orm.__tablename__} 结构已同步")
 
 LONG_STREAM_ENVS = [env for env in os.environ if env.startswith("LONG_STREAM_")]
 LONG_STREAM_ENV_DICT = {env: os.environ.get(env) for env in LONG_STREAM_ENVS}

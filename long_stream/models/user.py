@@ -3,24 +3,24 @@ from datetime import datetime
 from pydantic import BaseModel
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, func
+from typing import Optional
 
 
 class UserIn(BaseModel):
     username: str
     password: str  # 明文，只活在内存
+    account: str
 
 
 class UserOut(BaseModel):
     id: int
     username: str  # 返回时不含密码
+    account: str
+    avatar: Optional[str] = None
     create_at: datetime
-
-class UserORM(declarative_base()):
-    __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, index=True, nullable=False)
-    password_hash = Column(String(100), nullable=False)
-    create_at = Column(DateTime, server_default=func.now(), nullable=False)
+    update_at: Optional[datetime] = None
+    class Config:
+        from_attributes = True
 
 
 class Token(BaseModel):
