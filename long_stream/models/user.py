@@ -2,8 +2,17 @@
 from datetime import datetime
 from pydantic import BaseModel
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, func
+from sqlalchemy import Column, Integer, String, func
 from typing import Optional
+from db.database import Base
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    role = Column(String, default="user")  # 可选值: "guest", "user", "admin"
 
 
 class UserIn(BaseModel):
